@@ -1,56 +1,62 @@
 import TodoList from "@/components/Todo";
 import { TodoContext } from "@/components/TodoContext";
-import { useEffect, useState, useRef, createContext, useContext } from "react";
+import { LogType } from "@/type/Todo.type";
+import { useEffect, useState } from "react";
 
-interface ITodo {
-  title: string;
-  stat: boolean;
-  date: Date;
-}
 export default function Home() {
-  const [todos, setTodos] = useState<ITodo[]>([
-    {
-      title: "sdfg",
-      stat: false,
-      date: new Date(),
-    },
-  ]);
-  const [log, setLog] = useState<Array<ITodo[]>>([]);
+  const [todos, setTodos] = useState<string[]>([]);
+  const [log, setLog] = useState<LogType[]>([]);
 
-  useEffect(() => {
-    setLog([...log, [...todos.map((item) => ({ ...item }))]]);
-  }, [todos]);
+  const makeLog = (stat: string, value: string) => {
+    return {
+      title: value,
+      stat: stat,
+      date: new Date(),
+    }
+  }
 
   const addTodo = (title: string) => {
-    setTodos([...todos, { title, stat: false, date: new Date() }]);
+    setTodos([...todos, title]);
+    setLog([...log, makeLog("added", title)]);
   };
 
-  const updateTodoStatus = (index: number, stat: boolean) => {
-    const updatedTodos = [...todos];
-    updatedTodos[index].stat = stat;
-    setTodos(updatedTodos);
+  const checkTodo = (value: string) => {
+    setLog([...log, makeLog("checked", value)]);
+  };
+
+  const deleteTodo = (index: number) => {
+    const newLog = [...log, makeLog("deleted", todos[index])]
+    const newTodo = todos.filter((item, i) => {
+      if (i !== index) return item;
+    });
+    setLog(newLog);
+    setTodos(newTodo);
+  };
+
+  const updateTodo = (index: number, value: string) => {
+    const todo = [...todos];
+    todo[index] = value;
+    setLog([...log, makeLog("modified", value)]);
+    setTodos(todo);
   };
 
   return (
-    <div className="w-full  h-full flex">
-      <TodoContext.Provider value={{ todos, addTodo, updateTodoStatus }}>
+    <div className="w-full h-full flex">
+      <TodoContext.Provider
+        value={{ todos, addTodo, checkTodo, updateTodo, deleteTodo }}
+      >
         <TodoList />
       </TodoContext.Provider>
 
-      <div className="w-1/2 bg-[#E1F5FE] border-[1px] rounded-lg flex items-center flex-col overflow-auto">
+      <div className="w-1/2 bg-gray-400 border-[1px] rounded-lg flex items-center flex-col overflow-auto">
         <span className="text-4xl font-bold text-black mt-4">LOG</span>
         <div className="mt-4 flex flex-col w-4/5">
-          {log.map((data, idx1) => {
-            if (idx1 === 0) return null;
+          {log.map((data, idx) => {
             return (
-              <div className="bg-white mt-4 rounded-lg" key={idx1}>
-                {data.map((item, idx2) => (
-                  <div className="flex flex-col pl-4 pr-4 pt-2 pb-2" key={idx2}>
-                    <span>date : {item.date.toTimeString()}</span>
-                    <span>title : {item.title}</span>
-                    <span>status : {item.stat ? "checked" : "none"}</span>
-                  </div>
-                ))}
+              <div className="flex flex-col bg-gray-200 px-4 py-2 mb-5" key={idx}>
+                <span>date : {data.date.toLocaleDateString()}</span>
+                <span>title : {data.title}</span>
+                <span>status : {data.stat}</span>
               </div>
             );
           })}

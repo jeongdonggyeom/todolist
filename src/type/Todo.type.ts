@@ -1,5 +1,5 @@
-export interface ITodo {
+export interface LogType{
   title: string;
-  stat: boolean;
   date: Date;
+  stat: string;
 }

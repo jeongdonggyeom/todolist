@@ -1,8 +1,9 @@
-import { ITodo } from "@/type/Todo.type";
 import { createContext } from "react";
 
 export const TodoContext = createContext<{
-  todos: ITodo[];
+  todos: string[];
   addTodo: (title: string) => void;
-  updateTodoStatus: (index: number, stat: boolean) => void;
+  checkTodo: (value: string) => void;
+  deleteTodo: (index: number) => void;
+  updateTodo: (index: number, value: string) => void;
 } | null>(null);

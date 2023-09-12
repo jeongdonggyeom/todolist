@@ -1,33 +1,33 @@
-import React, { forwardRef, useRef, useEffect, useContext } from "react";
+import React, { forwardRef, useContext } from "react";
 import { TodoContext } from "./TodoContext";
 
-// ...
+const TodoItem = forwardRef<HTMLInputElement, { index: number; todo: string }>(
+  ({ index, todo }, ref) => {
+    const context = useContext(TodoContext);
 
-function TodoItem({ index, todo }, ref) {
-  const { updateTodoStatus } = useContext(TodoContext);
-  const checkboxRef = useRef(null);
+    const update = () => {
+      const data = prompt("수정할 내용 입력");
+      if (data) {
+        context?.updateTodo(index, data);
+        return;
+      }
+      alert("내용 없음");
+    };
 
-  useEffect(() => {
-    if (checkboxRef.current) {
-      checkboxRef.current.checked = todo.stat;
-    }
-  }, [todo.stat]);
+    return (
+      <div className="w-full h-[3rem] text-lg items-center bg-white border-[1px] pl-4 pr-4 flex justify-between">
+        {todo}
+        <button onClick={() => context?.deleteTodo(index)}>삭제</button>
+        <button onClick={update}>수정</button>
+        <input
+          type="checkbox"
+          onChange={(e) => context?.checkTodo(todo)}
+          ref={ref}
+        />
+      </div>
+    );
+  }
+);
+TodoItem.displayName = "TodoItem";
 
-  return (
-    <div className="w-full h-[3rem] text-lg items-center bg-white border-[1px] pl-4 pr-4 flex justify-between">
-      {todo.title}
-      <input
-        type="checkbox"
-        onChange={(e) => updateTodoStatus(index, e.target.checked)}
-        ref={(el) => {
-          checkboxRef.current = el;
-          if (ref) {
-            ref.current = el;
-          }
-        }}
-      />
-    </div>
-  );
-}
-
-export default forwardRef(TodoItem);
+export default TodoItem;

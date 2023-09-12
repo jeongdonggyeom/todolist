@@ -1,21 +1,22 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import TodoItem from "./TodoItem";
 import { TodoContext } from "./TodoContext";
 
 function TodoList() {
-  const { todos, addTodo } = useContext(TodoContext);
+  const context = useContext(TodoContext);
   const [text, setText] = useState<string>("");
+  const ref = useRef<HTMLInputElement>(null);
 
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
-    if (text.trim() !== "") {
-      addTodo(text);
+    if (context && text.trim() !== "") {
+      context.addTodo(text);
       setText("");
     }
   };
 
   return (
-    <div className="h-full w-1/2 bg-[#20c998] rounded-lg flex items-center flex-col overflow-auto">
+    <div className="h-full w-1/2 bg-black rounded-lg flex items-center flex-col overflow-auto">
       <span className="text-4xl font-bold text-white mt-4">TodoList</span>
       <form onSubmit={handleAddTodo} className="w-4/5 h-[4rem]">
         <input
@@ -26,8 +27,8 @@ function TodoList() {
         />
       </form>
       <div className="flex flex-col w-4/5 mt-4">
-        {todos.map((item, idx) => (
-          <TodoItem key={idx} index={idx} todo={item} />
+        {context?.todos.map((item: string, idx: number) => (
+          <TodoItem key={idx} index={idx} todo={item} ref={ref} />
         ))}
       </div>
     </div>
